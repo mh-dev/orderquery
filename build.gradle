@@ -1,0 +1,34 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'eclipse'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+group = 'mh.dev.common'
+version ='0.0.1-SNAPSHOT'
+
+repositories { 
+	mavenLocal()
+	mavenCentral() 
+	maven{
+		url 'http://mathias-hauser.at/archiva/repository/internal/'
+	}
+}
+
+dependencies {
+	//compile group: 'javax', name: 'javaee-api', version: '6.0'
+	compile group: 'mh.dev.common', name: 'util', version: '0.0.1'
+	compile group: 'mh.dev.common', name: 'logging', version: '0.0.1'
+	compile group: 'org.reflections', name: 'reflections', version: '0.9.9-RC1'
+	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.1'
+	testCompile group: 'junit', name: 'junit', version: '4.7'
+	testCompile group: 'org.jboss.arquillian', name: 'arquillian-bom', version: '1.0.3.Final'
+	testCompile group: 'org.jboss.arquillian.junit', name: 'arquillian-junit-container', version: '1.0.3.Final'
+	testCompile group: 'org.jboss.arquillian.container', name: 'arquillian-glassfish-embedded-3.1', version: '1.0.0.CR4'
+	testCompile group: 'org.glassfish.main.extras', name: 'glassfish-embedded-all', version: '3.1.2'
+	testCompile group: 'org.jboss.shrinkwrap.resolver', name: 'shrinkwrap-resolver-impl-maven', version: '2.0.0'
+	testCompile group: 'org.jboss.shrinkwrap.resolver', name: 'shrinkwrap-resolver-impl-maven-archive', version: '2.0.0'
+	//testRuntime group: 'postgresql', name:'postgresql',version:'9.1-901.jdbc4'
+	testRuntime group: 'org.hsqldb', name:'hsqldb', version:'2.3.0'
+}

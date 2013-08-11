@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<orderqueries basePackage="mh.dev.common.orderquery.test.environment.model">
+<!-- 	<orderquery name="user" defaultColumn="name" defaultOrder="DESC" -->
+<!-- 		model="user"> -->
+<!-- 		<query> -->
+<!-- 			SELECT u FROM User u WHERE u.name = :name -->
+<!-- 		</query> -->
+<!-- 	</orderquery> -->
+<!-- 	<model name="user" type="mh.dev.common.orderquery.test.environment.model.User"> -->
+<!-- 		<column name="name" query="u.name" /> -->
+<!-- 	</model> -->
+</orderqueries>
