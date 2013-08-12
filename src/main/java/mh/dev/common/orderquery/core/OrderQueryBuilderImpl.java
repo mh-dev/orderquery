@@ -168,10 +168,10 @@ public class OrderQueryBuilderImpl implements OrderQueryBuilder {
 						storeColumnData(modelName, xmlColumn.getName(), xmlColumn.getQuery());
 					}
 				} else {
-					log.error(String.format("Duplicate model definition for model  %s", modelName));
+					throw new OrderQueryException(String.format("Duplicate model definition for model  %s", modelName));
 				}
 			} else {
-				log.error(String.format("Class for type %s could not be found", xmlModel.getType()));
+				throw new OrderQueryException(String.format("Class for type %s could not be found", xmlModel.getType()));
 			}
 		}
 		log.debug("Load annotation model configuration");
@@ -186,8 +186,8 @@ public class OrderQueryBuilderImpl implements OrderQueryBuilder {
 				for (OrderQueryColumn orderQueryColumn : orderQueryModel.orderQueryColumns()) {
 					storeColumnData(modelName, orderQueryColumn.name(), orderQueryColumn.query());
 				}
-			} else {
-				log.error("Duplicate model definition for name %s", modelName);
+			} else if (!classes.containsKey(clazz) || !classes.get(clazz).equals(modelName)) {
+				throw new OrderQueryException(String.format("Duplicate model definition for name %s", modelName));
 			}
 			// read the configuration from the fields if it is not configured
 			for (Field field : clazz.getDeclaredFields()) {
@@ -227,11 +227,11 @@ public class OrderQueryBuilderImpl implements OrderQueryBuilder {
 							}
 						}
 					} else {
-						log.error("Could not find model %s for query %s", xmlOrderQuery.getModel(), xmlOrderQuery.getName());
+						throw new OrderQueryException(String.format("Could not find model %s for query %s", xmlOrderQuery.getModel(), xmlOrderQuery.getName()));
 					}
 				}
 			} else {
-				log.error("Duplicate or empty query definition for %s", xmlOrderQuery.getName());
+				throw new OrderQueryException(String.format("Duplicate or empty query definition for %s", xmlOrderQuery.getName()));
 			}
 		}
 		log.debug("Load annotation query configuration");
@@ -248,7 +248,7 @@ public class OrderQueryBuilderImpl implements OrderQueryBuilder {
 						storeQueryData(orderQuery.name(), orderQueryColumn.name(), orderQueryColumn.query());
 					}
 				} else {
-					log.error(String.format("Duplicate or empty query definition for %s", orderQuery.name()));
+					throw new OrderQueryException(String.format("Duplicate or empty query definition for %s", orderQuery.name()));
 				}
 				// load the model columns
 				if (classes.containsKey(orderQueriesClass)) {
@@ -307,7 +307,7 @@ public class OrderQueryBuilderImpl implements OrderQueryBuilder {
 			definedColumnNames.put(columnName, fieldName);
 			columnQueries.put(columnName, query);
 		} else {
-			log.error(String.format("Column definition for column %s of model %s is a duplicate or empty", fieldName, modelName));
+			throw new OrderQueryException(String.format("Column definition for column %s of model %s is a duplicate or empty", fieldName, modelName));
 		}
 	}
 
@@ -329,7 +329,7 @@ public class OrderQueryBuilderImpl implements OrderQueryBuilder {
 			definedColumnNames.put(columnName, fieldName);
 			columnQueries.put(columnName, query);
 		} else {
-			log.error(String.format("Duplicate column definition for column %s of query %s", fieldName, queryName));
+			throw new OrderQueryException(String.format("Duplicate column definition for column %s of query %s", fieldName, queryName));
 		}
 	}
 
@@ -406,7 +406,7 @@ public class OrderQueryBuilderImpl implements OrderQueryBuilder {
 			try {
 				orderQueries = XMLUtils.unmarshal(inputStream, XmlOrderQueries.class);
 			} catch (UnmarshalFailedException e) {
-				log.error(e.getMessage(), e);
+				throw new OrderQueryException(e);
 			}
 		}
 		return orderQueries;

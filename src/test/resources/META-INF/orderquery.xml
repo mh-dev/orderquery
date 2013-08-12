@@ -5,6 +5,10 @@
 		<column name="field1" query="xm.field1" />
 		<column name="field2" query="xm.field2" />
 	</model>
+	<model name="mixedModel" type="mh.dev.common.orderquery.test.environment.model.MixedModel">
+		<column name="field1" query="mm.field1" />
+		<column name="field2" query="mm.field2" />
+	</model>
 	<orderquery name="xmlModel" model="xmlModel">
 		<query>
 			SELECT xm FROM XmlModel xm
