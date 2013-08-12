@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <orderqueries basePackage="mh.dev.common.orderquery.test.environment.model">
-<!-- 	<orderquery name="user" defaultColumn="name" defaultOrder="DESC" -->
-<!-- 		model="user"> -->
-<!-- 		<query> -->
-<!-- 			SELECT u FROM User u WHERE u.name = :name -->
-<!-- 		</query> -->
-<!-- 	</orderquery> -->
-<!-- 	<model name="user" type="mh.dev.common.orderquery.test.environment.model.User"> -->
-<!-- 		<column name="name" query="u.name" /> -->
-<!-- 	</model> -->
+
+	<model name="xmlModel" type="mh.dev.common.orderquery.test.environment.model.XmlModel">
+		<column name="field1" query="xm.field1" />
+		<column name="field2" query="xm.field2" />
+	</model>
+	<orderquery name="xmlModel" model="xmlModel">
+		<query>
+			SELECT xm FROM XmlModel xm
+		</query>
+	</orderquery>
 </orderqueries>
