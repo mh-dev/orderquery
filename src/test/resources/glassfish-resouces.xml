@@ -13,5 +13,4 @@
 		<property name="user" value="sa" />
 		<property name="password" value="" />
 	</jdbc-connection-pool>
-
 </resources>

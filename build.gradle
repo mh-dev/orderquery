@@ -17,7 +17,6 @@ repositories {
 }
 
 dependencies {
-	//compile group: 'javax', name: 'javaee-api', version: '6.0'
 	compile group: 'mh.dev.common', name: 'util', version: '0.0.1'
 	compile group: 'mh.dev.common', name: 'logging', version: '0.0.1'
 	compile group: 'org.reflections', name: 'reflections', version: '0.9.9-RC1'
@@ -29,6 +28,5 @@ dependencies {
 	testCompile group: 'org.glassfish.main.extras', name: 'glassfish-embedded-all', version: '3.1.2'
 	testCompile group: 'org.jboss.shrinkwrap.resolver', name: 'shrinkwrap-resolver-impl-maven', version: '2.0.0'
 	testCompile group: 'org.jboss.shrinkwrap.resolver', name: 'shrinkwrap-resolver-impl-maven-archive', version: '2.0.0'
-	//testRuntime group: 'postgresql', name:'postgresql',version:'9.1-901.jdbc4'
 	testRuntime group: 'org.hsqldb', name:'hsqldb', version:'2.3.0'
 }

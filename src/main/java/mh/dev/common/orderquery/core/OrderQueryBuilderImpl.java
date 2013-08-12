@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.inject.Alternative;
 
 import mh.dev.common.orderquery.Order;
@@ -37,7 +36,6 @@ import org.slf4j.LoggerFactory;
  * @author Mathias Hauser
  * 
  */
-// @Singleton
 @Alternative
 public class OrderQueryBuilderImpl implements OrderQueryBuilder {
 
@@ -76,14 +74,15 @@ public class OrderQueryBuilderImpl implements OrderQueryBuilder {
 	private final static String MODEL_COLUMN = "model";
 	private final static String QUERY_COLUMN = "query";
 
-	@PostConstruct
 	public void load() {
+		log.debug("Loading the configuration");
 		// parsing orderquery.xml
 		XmlOrderQueries xmlOrderQueries = xmlConfiguration();
 		// load model column configuration
 		loadModels(xmlOrderQueries.getModels(), orderQueryModelClasses(xmlOrderQueries.getBasePackage()));
 		// load query configuration
 		loadQueries(xmlOrderQueries.getOrderQueries(), orderQueriesClasses(xmlOrderQueries.getBasePackage()));
+		log.info("OrderQuery is loaded");
 
 	}
 
@@ -92,7 +91,7 @@ public class OrderQueryBuilderImpl implements OrderQueryBuilder {
 		if (orderState instanceof OrderStateImpl) {
 			OrderStateImpl orderStateImpl = (OrderStateImpl) orderState;
 			if (queries.containsKey(orderStateImpl.getQueryName())) {
-				return render(queries.get(orderStateImpl.getQueryName()), orderStateImpl);
+				return appendOrderByStatement(queries.get(orderStateImpl.getQueryName()), orderStateImpl);
 			} else {
 				throw new OrderQueryException(String.format("Query %s does not exist", orderStateImpl.getQueryName()));
 			}
@@ -101,7 +100,16 @@ public class OrderQueryBuilderImpl implements OrderQueryBuilder {
 		}
 	}
 
-	private String render(String query, OrderStateImpl orderStateImpl) {
+	/**
+	 * Appends the the Order By statement to the a query if orderStateImpl has a order column
+	 * 
+	 * @param query
+	 *            which should be append
+	 * @param orderStateImpl
+	 *            the current order configuration
+	 * @return query appended with the order by statement
+	 */
+	private String appendOrderByStatement(String query, OrderStateImpl orderStateImpl) {
 		StringBuilder builder = new StringBuilder(query);
 		int orderColumns = orderStateImpl.orderedColumns().size();
 		if (orderColumns > 0) {
@@ -143,7 +151,8 @@ public class OrderQueryBuilderImpl implements OrderQueryBuilder {
 	 *            annotation based configured classes
 	 */
 	private void loadModels(List<XmlModel> xmlModels, Set<Class<?>> orderQueryModelClasses) {
-		log.info("Load OrderQuery models");
+		log.debug("Load OrderQuery models");
+		log.debug("Load xml model configuration");
 		// highest priority has the xml configuration
 		for (XmlModel xmlModel : xmlModels) {
 			Class<?> clazz = readClass(xmlModel.getType());
@@ -152,23 +161,27 @@ public class OrderQueryBuilderImpl implements OrderQueryBuilder {
 				String modelName = getModelName(xmlModel, clazz);
 				// read the data from this model class if it is not configured
 				if (!modelColumns.containsKey(modelName)) {
+					log.debug(String.format("Add model %s with class %s to the index", modelName, clazz.getName()));
 					classes.put(clazz, modelName);
 					for (XmlColumn xmlColumn : xmlModel.getColumns()) {
+						log.debug(String.format("Add column name %s with query %s to model %s", xmlColumn.getName(), xmlColumn.getQuery(), modelName));
 						storeColumnData(modelName, xmlColumn.getName(), xmlColumn.getQuery());
 					}
 				} else {
-					log.error("Duplicate model definition for model  %s", modelName);
+					log.error(String.format("Duplicate model definition for model  %s", modelName));
 				}
 			} else {
 				log.error(String.format("Class for type %s could not be found", xmlModel.getType()));
 			}
 		}
+		log.debug("Load annotation model configuration");
 		// read all annotation configured model classes
 		for (Class<?> clazz : orderQueryModelClasses) {
 			OrderQueryModel orderQueryModel = clazz.getAnnotation(OrderQueryModel.class);
 			String modelName = getModelName(clazz);
 			// read the configuration for this model class if it is not configured
 			if (!modelColumns.containsKey(modelName)) {
+				log.debug(String.format("Add model %s with class %s to the index", modelName, clazz.getName()));
 				classes.put(clazz, modelName);
 				for (OrderQueryColumn orderQueryColumn : orderQueryModel.orderQueryColumns()) {
 					storeColumnData(modelName, orderQueryColumn.name(), orderQueryColumn.query());
@@ -181,6 +194,7 @@ public class OrderQueryBuilderImpl implements OrderQueryBuilder {
 				if (field.isAnnotationPresent(OrderQueryColumn.class)) {
 					OrderQueryColumn orderQueryColumn = field.getAnnotation(OrderQueryColumn.class);
 					String fieldName = StringUtils.isNotBlank(orderQueryColumn.name()) ? orderQueryColumn.name() : field.getName();
+					log.debug(String.format("Add column name %s with query %s to model %s", fieldName, orderQueryColumn.query(), modelName));
 					storeColumnData(modelName, fieldName, orderQueryColumn.query());
 				}
 			}
@@ -188,11 +202,12 @@ public class OrderQueryBuilderImpl implements OrderQueryBuilder {
 	}
 
 	private void loadQueries(List<XmlOrderQuery> xmlOrderQueries, Set<Class<?>> orderQueriesClasses) {
-		log.info("Load OrderQuery queries");
+		log.debug("Load OrderQuery queries");
+		log.debug("Load xml query configuration");
 		// highest priority has the xml configuration
 		for (XmlOrderQuery xmlOrderQuery : xmlOrderQueries) {
 			if (StringUtils.isNotBlank(xmlOrderQuery.getName()) && !queryColumns.containsKey(xmlOrderQuery.getName())) {
-				log.trace("Add orderquery " + xmlOrderQuery.getName());
+				log.debug(String.format("Add orderquery name %s with query %s", xmlOrderQuery.getName(), xmlOrderQuery.getQuery()));
 				queries.put(xmlOrderQuery.getName(), xmlOrderQuery.getQuery());
 				queryColumns.putIfAbsent(xmlOrderQuery.getName(), new ArrayList<String>());
 				// query order column configuration overrules model configuration so we put it in first
@@ -207,8 +222,8 @@ public class OrderQueryBuilderImpl implements OrderQueryBuilder {
 							if (!isColumnNameMapped(xmlOrderQuery.getName(), columnName)) {
 								queryColumns.get(xmlOrderQuery.getName()).add(columnName);
 							} else {
-								log.info("Model column definition for column %s was overruled buy a query column definition",
-										definedColumnNames.get(columnName));
+								log.info(String.format("Model column definition for column %s was overruled buy a query column definition",
+										definedColumnNames.get(columnName)));
 							}
 						}
 					} else {
@@ -219,12 +234,13 @@ public class OrderQueryBuilderImpl implements OrderQueryBuilder {
 				log.error("Duplicate or empty query definition for %s", xmlOrderQuery.getName());
 			}
 		}
+		log.debug("Load annotation query configuration");
 		// load the annotation configuration
 		for (Class<?> orderQueriesClass : orderQueriesClasses) {
 			OrderQueries orderQueries = orderQueriesClass.getAnnotation(OrderQueries.class);
 			for (OrderQuery orderQuery : orderQueries.value()) {
 				if (StringUtils.isNotBlank(orderQuery.name()) && !queryColumns.containsKey(orderQuery.name())) {
-					log.trace("Add orderquery " + orderQuery.query());
+					log.debug(String.format("Add orderquery name %s with query %s", orderQuery.name(), orderQuery.query()));
 					queries.put(orderQuery.name(), orderQuery.query());
 					queryColumns.putIfAbsent(orderQuery.name(), new ArrayList<String>());
 					// query order column configuration overrules model configuration so we put it in first
@@ -232,7 +248,7 @@ public class OrderQueryBuilderImpl implements OrderQueryBuilder {
 						storeQueryData(orderQuery.name(), orderQueryColumn.name(), orderQueryColumn.query());
 					}
 				} else {
-					log.error("Duplicate or empty query definition for %s", orderQuery.name());
+					log.error(String.format("Duplicate or empty query definition for %s", orderQuery.name()));
 				}
 				// load the model columns
 				if (classes.containsKey(orderQueriesClass)) {
@@ -242,7 +258,8 @@ public class OrderQueryBuilderImpl implements OrderQueryBuilder {
 						if (!isColumnNameMapped(modelName, columnName)) {
 							queryColumns.get(modelName).add(columnName);
 						} else {
-							log.info("Model column definition for column %s was overruled buy a query column definition", definedColumnNames.get(columnName));
+							log.info(String.format("Model column definition for column %s was overruled buy a query column definition",
+									definedColumnNames.get(columnName)));
 						}
 					}
 				}
@@ -290,7 +307,7 @@ public class OrderQueryBuilderImpl implements OrderQueryBuilder {
 			definedColumnNames.put(columnName, fieldName);
 			columnQueries.put(columnName, query);
 		} else {
-			log.error("Column definition for column %s of model %s is a duplicate or empty", fieldName, modelName);
+			log.error(String.format("Column definition for column %s of model %s is a duplicate or empty", fieldName, modelName));
 		}
 	}
 
@@ -312,7 +329,7 @@ public class OrderQueryBuilderImpl implements OrderQueryBuilder {
 			definedColumnNames.put(columnName, fieldName);
 			columnQueries.put(columnName, query);
 		} else {
-			log.error("Duplicate column definition for column %s of query %s", fieldName, queryName);
+			log.error(String.format("Duplicate column definition for column %s of query %s", fieldName, queryName));
 		}
 	}
 
