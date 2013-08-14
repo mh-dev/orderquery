@@ -15,10 +15,12 @@ import mh.dev.common.orderquery.test.core.TestCore;
 import mh.dev.common.orderquery.test.environment.model.AnnotationModel;
 import mh.dev.common.orderquery.test.environment.service.AnnotationModelService;
 
+import org.jboss.arquillian.junit.Arquillian;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
+import org.junit.runner.RunWith;
+@RunWith(Arquillian.class)
 public class AnnotationModelOrderStateTests extends TestCore {
 
 	@EJB

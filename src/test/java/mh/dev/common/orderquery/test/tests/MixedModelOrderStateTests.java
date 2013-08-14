@@ -15,10 +15,13 @@ import mh.dev.common.orderquery.test.core.TestCore;
 import mh.dev.common.orderquery.test.environment.model.MixedModel;
 import mh.dev.common.orderquery.test.environment.service.MixedModelService;
 
+import org.jboss.arquillian.junit.Arquillian;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(Arquillian.class)
 public class MixedModelOrderStateTests extends TestCore {
 
 	@EJB

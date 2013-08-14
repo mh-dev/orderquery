@@ -15,10 +15,12 @@ import mh.dev.common.orderquery.test.core.TestCore;
 import mh.dev.common.orderquery.test.environment.model.XmlModel;
 import mh.dev.common.orderquery.test.environment.service.XmlModelService;
 
+import org.jboss.arquillian.junit.Arquillian;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
+import org.junit.runner.RunWith;
+@RunWith(Arquillian.class)
 public class XmlModelOrderStateTests extends TestCore {
 
 	@EJB
