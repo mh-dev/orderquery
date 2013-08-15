@@ -1,4 +1,4 @@
-package mh.dev.common.orderquery.xml;
+package mh.dev.common.orderquery.core.loader.xml.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,7 @@ public class XmlOrderQueries {
 
 	private List<XmlModel> models = new ArrayList<>();
 
-	@XmlAttribute
+	@XmlAttribute(name = "base-package")
 	public String getBasePackage() {
 		return basePackage;
 	}

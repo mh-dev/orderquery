@@ -1,4 +1,4 @@
-package mh.dev.common.orderquery.xml;
+package mh.dev.common.orderquery.core.loader.xml.model;
 
 import java.util.ArrayList;
 import java.util.List;

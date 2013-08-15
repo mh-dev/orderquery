@@ -17,10 +17,10 @@ import mh.dev.common.orderquery.annotation.OrderQuery;
 import mh.dev.common.orderquery.annotation.OrderQueryColumn;
 import mh.dev.common.orderquery.annotation.OrderQueryModel;
 import mh.dev.common.orderquery.core.exception.OrderQueryException;
-import mh.dev.common.orderquery.xml.XmlColumn;
-import mh.dev.common.orderquery.xml.XmlModel;
-import mh.dev.common.orderquery.xml.XmlOrderQueries;
-import mh.dev.common.orderquery.xml.XmlOrderQuery;
+import mh.dev.common.orderquery.core.loader.xml.model.XmlColumn;
+import mh.dev.common.orderquery.core.loader.xml.model.XmlModel;
+import mh.dev.common.orderquery.core.loader.xml.model.XmlOrderQueries;
+import mh.dev.common.orderquery.core.loader.xml.model.XmlOrderQuery;
 import mh.dev.common.util.xml.XMLUtils;
 import mh.dev.common.util.xml.exception.UnmarshalFailedException;
 

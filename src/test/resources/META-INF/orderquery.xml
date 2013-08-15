@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<orderqueries basePackage="mh.dev.common.orderquery.test.environment.model">
+<orderqueries base-package="mh.dev.common.orderquery.test.environment.model">
 
 	<model name="xmlModel" type="mh.dev.common.orderquery.test.environment.model.XmlModel">
 		<column name="field1" query="xm.field1" />
