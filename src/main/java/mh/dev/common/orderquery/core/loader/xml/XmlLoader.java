@@ -49,7 +49,7 @@ public class XmlLoader implements ModelLoader, ConfigLoader {
 	}
 
 	@Override
-	public List<OrderQueryModel> loadModel() {
+	public List<OrderQueryModel> loadModels() {
 		List<OrderQueryModel> orderQueryModels = new ArrayList<>();
 		for (XmlModel xmlModel : xmlOrderQueries.getModels()) {
 			OrderQueryModel orderQueryModel = new OrderQueryModel();
@@ -64,9 +64,8 @@ public class XmlLoader implements ModelLoader, ConfigLoader {
 					OrderQueryColumn orderQueryColumn = new OrderQueryColumn();
 					orderQueryColumn.setName(xmlColumn.getName());
 					orderQueryColumn.setQuery(xmlColumn.getQuery());
-					orderQueryModel.add(orderQueryColumn);
+					orderQueryModel.getColumns().add(orderQueryColumn);
 				}
-
 			} catch (ClassNotFoundException e) {
 				throw new OrderQueryException(String.format("Class for model %s with type %s could not be found", xmlModel.getName(), xmlModel.getType()));
 			}

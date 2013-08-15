@@ -1,13 +1,14 @@
 package mh.dev.common.orderquery.core.model;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 public class OrderQueryModel {
 
 	private String name;
-	private Class<?> clazz;
+	private Class<?> type;
 
-	private HashMap<String, OrderQueryColumn> columns = new HashMap<>();
+	private List<OrderQueryColumn> columns = new ArrayList<>();
 
 	public String getName() {
 		return name;
@@ -17,24 +18,20 @@ public class OrderQueryModel {
 		this.name = name;
 	}
 
-	public Class<?> getClazz() {
-		return clazz;
+	public Class<?> getType() {
+		return type;
 	}
 
-	public void setClazz(Class<?> clazz) {
-		this.clazz = clazz;
+	public void setType(Class<?> clazz) {
+		this.type = clazz;
 	}
 
-	public HashMap<String, OrderQueryColumn> getColumns() {
+	public List<OrderQueryColumn> getColumns() {
 		return columns;
 	}
 
-	public void setColumns(HashMap<String, OrderQueryColumn> columns) {
+	public void setColumns(List<OrderQueryColumn> columns) {
 		this.columns = columns;
-	}
-
-	public void add(OrderQueryColumn orderQueryColumn) {
-		columns.put(orderQueryColumn.getName(), orderQueryColumn);
 	}
 
 }
