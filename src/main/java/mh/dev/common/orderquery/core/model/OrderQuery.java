@@ -8,6 +8,7 @@ import mh.dev.common.orderquery.Order;
 public class OrderQuery {
 
 	private String model;
+	private Class<?> type;
 	private String name;
 	private String query;
 	private String defaultColumn;
@@ -61,6 +62,23 @@ public class OrderQuery {
 
 	public void setModel(String model) {
 		this.model = model;
+	}
+
+	public Class<?> getType() {
+		return type;
+	}
+
+	public void setType(Class<?> type) {
+		this.type = type;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("OrderQuery [model=").append(model).append(", type=").append(type).append(", name=").append(name).append(", query=").append(query)
+				.append(", defaultColumn=").append(defaultColumn).append(", defaultOrder=").append(defaultOrder).append(", columns=").append(columns)
+				.append("]");
+		return builder.toString();
 	}
 
 }

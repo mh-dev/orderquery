@@ -34,4 +34,11 @@ public class OrderQueryModel {
 		this.columns = columns;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("OrderQueryModel [name=").append(name).append(", type=").append(type).append(", columns=").append(columns).append("]");
+		return builder.toString();
+	}
+
 }

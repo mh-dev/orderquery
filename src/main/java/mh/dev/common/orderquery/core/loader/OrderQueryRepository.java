@@ -1,8 +1,10 @@
 package mh.dev.common.orderquery.core.loader;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import mh.dev.common.orderquery.core.exception.OrderQueryException;
 import mh.dev.common.orderquery.core.model.OrderQuery;
@@ -19,31 +21,31 @@ public class OrderQueryRepository {
 	/**
 	 * modelName, columnNames
 	 */
-	private HashMap<String, List<String>> modelColumns = new HashMap<>();
+	private ConcurrentHashMap<String, List<String>> modelColumns = new ConcurrentHashMap<>();
 	/**
 	 * internal columnName, public column name
 	 */
-	private HashMap<String, String> definedColumnNames = new HashMap<>();
+	private ConcurrentHashMap<String, String> definedColumnNames = new ConcurrentHashMap<>();
 	/**
 	 * columnName, jpqlQuery
 	 */
-	private HashMap<String, String> columnQueries = new HashMap<>();
+	private ConcurrentHashMap<String, String> columnQueries = new ConcurrentHashMap<>();
 
 	// Query configuration
 	/**
 	 * queryName, columnNames
 	 */
-	private HashMap<String, List<String>> queryColumns = new HashMap<>();
+	private ConcurrentHashMap<String, List<String>> queryColumns = new ConcurrentHashMap<>();
 	/**
 	 * queryName, jpqlQuery
 	 */
-	private HashMap<String, String> queries = new HashMap<>();
+	private ConcurrentHashMap<String, String> queries = new ConcurrentHashMap<>();
 
 	// Model configuration
 	/**
 	 * class, modelName
 	 */
-	private HashMap<Class<?>, String> classes = new HashMap<>();
+	private ConcurrentHashMap<Class<?>, String> classes = new ConcurrentHashMap<>();
 
 	// Sources
 	private List<String> sources = new ArrayList<>();
@@ -57,11 +59,11 @@ public class OrderQueryRepository {
 		log.info(String.format("load orderquery models from source %s", source));
 		sources.add(source);
 		for (OrderQueryModel orderQueryModel : orderQueryModels) {
-			if (!modelColumns.containsKey(orderQueryModel.getName())) {
-				log.debug(String.format("Add model %s with class %s to the index", orderQueryModel.getName(), orderQueryModel.getType().getName()));
+			if (!classes.containsKey(orderQueryModel.getName()) || classes.get(orderQueryModel.getName()).equals(orderQueryModel.getType())) {
+				log.info(String.format("Add model %s with class %s to the index", orderQueryModel.getName(), orderQueryModel.getType().getName()));
 				classes.put(orderQueryModel.getType(), orderQueryModel.getName());
 				for (OrderQueryColumn column : orderQueryModel.getColumns()) {
-					log.debug(String.format("Add column name %s with query %s to model %s", column.getName(), column.getQuery(), orderQueryModel.getName()));
+					log.info(String.format("Add column name %s with query %s to model %s", column.getName(), column.getQuery(), orderQueryModel.getName()));
 					String columnName = MODEL_COLUMN.concat(source).concat(orderQueryModel.getName()).concat(column.getName());
 					// we need this to ensure that we don't have a false positive duplicate
 					if (StringUtils.isNotBlank(column.getName()) && !modelColumns.containsKey(columnName)) {
@@ -72,12 +74,13 @@ public class OrderQueryRepository {
 						definedColumnNames.put(columnName, column.getName());
 						columnQueries.put(columnName, column.getQuery());
 					} else {
-						throw new OrderQueryException(String.format("Column definition for column %s of model %s is a duplicate or empty", column.getName(),
-								orderQueryModel.getName()));
+						throw new OrderQueryException(String.format("Column definition for source %s at column %s of model %s is a duplicate or empty", source,
+								column.getName(), orderQueryModel.getName()));
 					}
 				}
 			} else {
-				throw new OrderQueryException(String.format("Duplicate model definition for model  %s", orderQueryModel.getName()));
+				throw new OrderQueryException(String.format("Model with name %s is configured with different types -> class %s and %s",
+						orderQueryModel.getName(), orderQueryModel.getType(), classes.get(orderQueryModel.getName())));
 			}
 		}
 	}
@@ -141,5 +144,41 @@ public class OrderQueryRepository {
 			}
 		}
 		return false;
+	}
+
+	public boolean queryExists(String queryName) {
+		return queries.containsKey(queryName);
+	}
+
+	public String query(String queryName) {
+		return queries.get(queryName);
+	}
+
+	public String columnQuery(String column) {
+		return columnQueries.get(column);
+	}
+
+	public String definedColumn(String column) {
+		return definedColumnNames.get(column);
+	}
+
+	public List<String> queryColumns(String queryName) {
+		List<String> columns = new ArrayList<>();
+		Set<String> mappedDefinedColumns = new HashSet<>();
+		for (String column : queryColumns.get(queryName)) {
+			String definedColumn = definedColumnNames.get(column);
+			if (!mappedDefinedColumns.contains(definedColumn)) {
+				mappedDefinedColumns.add(definedColumn);
+				columns.add(column);
+			}
+		}
+		for (String column : modelColumns.get(queryName)) {
+			String definedColumn = definedColumnNames.get(column);
+			if (!mappedDefinedColumns.contains(definedColumn)) {
+				mappedDefinedColumns.add(definedColumn);
+				columns.add(column);
+			}
+		}
+		return columns;
 	}
 }

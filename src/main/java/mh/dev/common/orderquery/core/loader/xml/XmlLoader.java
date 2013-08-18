@@ -7,9 +7,12 @@ import java.util.List;
 import mh.dev.common.orderquery.core.exception.OrderQueryException;
 import mh.dev.common.orderquery.core.loader.ConfigLoader;
 import mh.dev.common.orderquery.core.loader.ModelLoader;
+import mh.dev.common.orderquery.core.loader.QueryLoader;
 import mh.dev.common.orderquery.core.loader.xml.model.XmlColumn;
 import mh.dev.common.orderquery.core.loader.xml.model.XmlModel;
 import mh.dev.common.orderquery.core.loader.xml.model.XmlOrderQueries;
+import mh.dev.common.orderquery.core.loader.xml.model.XmlOrderQuery;
+import mh.dev.common.orderquery.core.model.OrderQuery;
 import mh.dev.common.orderquery.core.model.OrderQueryColumn;
 import mh.dev.common.orderquery.core.model.OrderQueryModel;
 import mh.dev.common.util.xml.XMLUtils;
@@ -25,27 +28,30 @@ import org.slf4j.LoggerFactory;
  * @author Mathias Hauser
  * 
  */
-public class XmlLoader implements ModelLoader, ConfigLoader {
+public class XmlLoader implements ModelLoader, QueryLoader, ConfigLoader {
 
 	private XmlOrderQueries xmlOrderQueries;
 
+	private boolean initialized = false;
 	private static final Logger log = LoggerFactory.getLogger(XmlLoader.class);
 	private static final String ORDER_QUERY_XML_LOCATION = "META-INF/orderquery.xml";
 
 	@Override
 	public void initialize() {
-		log.debug("Initialize the xml configuration");
-		InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(ORDER_QUERY_XML_LOCATION);
-		if (inputStream != null) {
-			try {
-				xmlOrderQueries = XMLUtils.unmarshal(inputStream, XmlOrderQueries.class);
-			} catch (UnmarshalFailedException e) {
-				throw new OrderQueryException(e);
+		if (!initialized) {
+			log.debug("Initialize the xml configuration");
+			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(ORDER_QUERY_XML_LOCATION);
+			if (inputStream != null) {
+				try {
+					xmlOrderQueries = XMLUtils.unmarshal(inputStream, XmlOrderQueries.class);
+				} catch (UnmarshalFailedException e) {
+					throw new OrderQueryException(e);
+				}
+			} else {
+				throw new OrderQueryException("orderquery.xml does not exist in the META-INF folder");
 			}
-		} else {
-			throw new OrderQueryException("orderquery.xml does not exist in the META-INF folder");
+			initialized = true;
 		}
-
 	}
 
 	@Override
@@ -60,6 +66,7 @@ public class XmlLoader implements ModelLoader, ConfigLoader {
 					modelName = StringUtils.uncapitalize(clazz.getSimpleName());
 				}
 				orderQueryModel.setName(modelName);
+				orderQueryModel.setType(clazz);
 				for (XmlColumn xmlColumn : xmlModel.getColumns()) {
 					OrderQueryColumn orderQueryColumn = new OrderQueryColumn();
 					orderQueryColumn.setName(xmlColumn.getName());
@@ -69,8 +76,28 @@ public class XmlLoader implements ModelLoader, ConfigLoader {
 			} catch (ClassNotFoundException e) {
 				throw new OrderQueryException(String.format("Class for model %s with type %s could not be found", xmlModel.getName(), xmlModel.getType()));
 			}
+			orderQueryModels.add(orderQueryModel);
 		}
 		return orderQueryModels;
+	}
+
+	@Override
+	public List<OrderQuery> loadOrderQueries() {
+		List<OrderQuery> orderQueries = new ArrayList<>();
+		for (XmlOrderQuery xmlOrderQuery : xmlOrderQueries.getOrderQueries()) {
+			OrderQuery orderQuery = new OrderQuery();
+			orderQuery.setModel(xmlOrderQuery.getModel());
+			orderQuery.setName(xmlOrderQuery.getName());
+			orderQuery.setQuery(xmlOrderQuery.getQuery());
+			for (XmlColumn xmlColumn : xmlOrderQuery.getColumns()) {
+				OrderQueryColumn orderQueryColumn = new OrderQueryColumn();
+				orderQueryColumn.setName(xmlColumn.getName());
+				orderQueryColumn.setQuery(xmlColumn.getQuery());
+				orderQuery.getColumns().add(orderQueryColumn);
+			}
+			orderQueries.add(orderQuery);
+		}
+		return orderQueries;
 	}
 
 	@Override
