@@ -6,11 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.ejb.EJB;
-import javax.inject.Inject;
 
 import mh.dev.common.orderquery.Order;
-import mh.dev.common.orderquery.OrderState;
-import mh.dev.common.orderquery.annotation.OrderStateConfig;
 import mh.dev.common.orderquery.test.core.TestCore;
 import mh.dev.common.orderquery.test.environment.model.AnnotationModel;
 import mh.dev.common.orderquery.test.environment.service.AnnotationModelService;
@@ -22,20 +19,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(Arquillian.class)
-public class AnnotationModelOrderStateTests extends TestCore {
+public class AnnotationModelColumnListOrderListTests extends TestCore {
 
 	@EJB
 	private AnnotationModelService service;
-
-	@Inject
-	@OrderStateConfig(queryName = "annotationModel")
-	private OrderState orderState;
-	@Inject
-	@OrderStateConfig(queryName = "annotationModelASC")
-	private OrderState orderStateDefaultASC;
-	@Inject
-	@OrderStateConfig(queryName = "annotationModelDESC")
-	private OrderState orderStateDefaultDESC;
 
 	private List<AnnotationModel> annotationModels = new ArrayList<>();
 
@@ -56,31 +43,12 @@ public class AnnotationModelOrderStateTests extends TestCore {
 	}
 
 	@Test
-	public void orderByDefaultAttribute1Desc() {
-		List<AnnotationModel> orderedModels = service.all(orderStateDefaultDESC);
-		assertEquals(annotationModels.get(4).getField1(), orderedModels.get(0).getField1());
-		assertEquals(annotationModels.get(3).getField1(), orderedModels.get(1).getField1());
-		assertEquals(annotationModels.get(5).getField1(), orderedModels.get(2).getField1());
-		assertEquals(annotationModels.get(1).getField1(), orderedModels.get(3).getField1());
-		assertEquals(annotationModels.get(2).getField1(), orderedModels.get(4).getField1());
-		assertEquals(annotationModels.get(0).getField1(), orderedModels.get(5).getField1());
-	}
-
-	@Test
-	public void orderByDefaultAttribute1Asc() {
-		List<AnnotationModel> orderedModels = service.all(orderStateDefaultASC);
-		assertEquals(annotationModels.get(0).getField1(), orderedModels.get(0).getField1());
-		assertEquals(annotationModels.get(2).getField1(), orderedModels.get(1).getField1());
-		assertEquals(annotationModels.get(1).getField1(), orderedModels.get(2).getField1());
-		assertEquals(annotationModels.get(5).getField1(), orderedModels.get(3).getField1());
-		assertEquals(annotationModels.get(3).getField1(), orderedModels.get(4).getField1());
-		assertEquals(annotationModels.get(4).getField1(), orderedModels.get(5).getField1());
-	}
-
-	@Test
 	public void orderByAttribute1Desc() {
-		orderState.order("field1", Order.DESC);
-		List<AnnotationModel> orderedModels = service.all(orderState);
+		List<String> column = new ArrayList<>();
+		column.add("field1");
+		List<Order> orders = new ArrayList<>();
+		orders.add(Order.DESC);
+		List<AnnotationModel> orderedModels = service.all("annotationModel", column, orders);
 		assertEquals(annotationModels.get(4).getField1(), orderedModels.get(0).getField1());
 		assertEquals(annotationModels.get(3).getField1(), orderedModels.get(1).getField1());
 		assertEquals(annotationModels.get(5).getField1(), orderedModels.get(2).getField1());
@@ -91,8 +59,11 @@ public class AnnotationModelOrderStateTests extends TestCore {
 
 	@Test
 	public void orderByAttribute1Asc() {
-		orderState.order("field1", Order.ASC);
-		List<AnnotationModel> orderedModels = service.all(orderState);
+		List<String> column = new ArrayList<>();
+		column.add("field1");
+		List<Order> orders = new ArrayList<>();
+		orders.add(Order.ASC);
+		List<AnnotationModel> orderedModels = service.all("annotationModel", column, orders);
 		assertEquals(annotationModels.get(0).getField1(), orderedModels.get(0).getField1());
 		assertEquals(annotationModels.get(2).getField1(), orderedModels.get(1).getField1());
 		assertEquals(annotationModels.get(1).getField1(), orderedModels.get(2).getField1());
@@ -103,9 +74,13 @@ public class AnnotationModelOrderStateTests extends TestCore {
 
 	@Test
 	public void orderByAttribute2DescAndAttribute1Desc() {
-		orderState.order("field2", Order.DESC);
-		orderState.order("field1", Order.DESC);
-		List<AnnotationModel> orderedModels = service.all(orderState);
+		List<String> column = new ArrayList<>();
+		column.add("field2");
+		column.add("field1");
+		List<Order> orders = new ArrayList<>();
+		orders.add(Order.DESC);
+		orders.add(Order.DESC);
+		List<AnnotationModel> orderedModels = service.all("annotationModel", column, orders);
 		assertEquals(annotationModels.get(3).getField1(), orderedModels.get(0).getField1());
 		assertEquals(annotationModels.get(5).getField1(), orderedModels.get(1).getField1());
 		assertEquals(annotationModels.get(2).getField1(), orderedModels.get(2).getField1());
@@ -116,9 +91,13 @@ public class AnnotationModelOrderStateTests extends TestCore {
 
 	@Test
 	public void orderByAttribute2AscAndAttribute1Asc() {
-		orderState.order("field2", Order.ASC);
-		orderState.order("field1", Order.ASC);
-		List<AnnotationModel> orderedModels = service.all(orderState);
+		List<String> column = new ArrayList<>();
+		column.add("field2");
+		column.add("field1");
+		List<Order> orders = new ArrayList<>();
+		orders.add(Order.ASC);
+		orders.add(Order.ASC);
+		List<AnnotationModel> orderedModels = service.all("annotationModel", column, orders);
 		assertEquals(annotationModels.get(0).getField1(), orderedModels.get(0).getField1());
 		assertEquals(annotationModels.get(1).getField1(), orderedModels.get(1).getField1());
 		assertEquals(annotationModels.get(4).getField1(), orderedModels.get(2).getField1());
@@ -129,9 +108,13 @@ public class AnnotationModelOrderStateTests extends TestCore {
 
 	@Test
 	public void orderByAttribute2DescAndAttribute1Asc() {
-		orderState.order("field2", Order.DESC);
-		orderState.order("field1", Order.ASC);
-		List<AnnotationModel> orderedModels = service.all(orderState);
+		List<String> column = new ArrayList<>();
+		column.add("field2");
+		column.add("field1");
+		List<Order> orders = new ArrayList<>();
+		orders.add(Order.DESC);
+		orders.add(Order.ASC);
+		List<AnnotationModel> orderedModels = service.all("annotationModel", column, orders);
 		assertEquals(annotationModels.get(2).getField1(), orderedModels.get(0).getField1());
 		assertEquals(annotationModels.get(5).getField1(), orderedModels.get(1).getField1());
 		assertEquals(annotationModels.get(3).getField1(), orderedModels.get(2).getField1());
@@ -142,9 +125,13 @@ public class AnnotationModelOrderStateTests extends TestCore {
 
 	@Test
 	public void orderByAttribute2AscAndAttribute1Desc() {
-		orderState.order("field2", Order.ASC);
-		orderState.order("field1", Order.DESC);
-		List<AnnotationModel> orderedModels = service.all(orderState);
+		List<String> column = new ArrayList<>();
+		column.add("field2");
+		column.add("field1");
+		List<Order> orders = new ArrayList<>();
+		orders.add(Order.ASC);
+		orders.add(Order.DESC);
+		List<AnnotationModel> orderedModels = service.all("annotationModel", column, orders);
 		assertEquals(annotationModels.get(1).getField1(), orderedModels.get(0).getField1());
 		assertEquals(annotationModels.get(0).getField1(), orderedModels.get(1).getField1());
 		assertEquals(annotationModels.get(4).getField1(), orderedModels.get(2).getField1());

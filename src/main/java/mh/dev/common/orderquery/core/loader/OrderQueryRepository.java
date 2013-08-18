@@ -190,7 +190,11 @@ public class OrderQueryRepository {
 	}
 
 	public String query(String queryName) {
-		return queries.get(queryName);
+		if (queries.containsKey(queryName)) {
+			return queries.get(queryName);
+		} else {
+			throw new OrderQueryException(String.format("OrderQuery with name %s could not be found", queryName));
+		}
 	}
 
 	public String columnQuery(String column) {

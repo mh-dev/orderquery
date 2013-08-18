@@ -1,5 +1,7 @@
 package mh.dev.common.orderquery.core;
 
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.enterprise.inject.Alternative;
@@ -41,6 +43,67 @@ public class OrderQueryBuilderImpl implements OrderQueryBuilder {
 			}
 		} else {
 			throw new OrderQueryException("The orderState object has the wrong type - you may tried to use an own implementation which will not work!");
+		}
+	}
+
+	@Override
+	public String render(String queryName, List<String> orderedColumnNames, Map<String, Order> orderMappings) {
+		if (orderedColumnNames.size() == orderMappings.keySet().size()) {
+			StringBuilder query = new StringBuilder(orderQueryRepository.query(queryName));
+			List<String> existingQueryColumns = orderQueryRepository.queryColumns(queryName);
+			int used = 0;
+			for (String definedColumnName : orderedColumnNames) {
+				if (orderMappings.containsKey(definedColumnName)) {
+					Order order = orderMappings.get(definedColumnName);
+					if (!Order.NONE.equals(order)) {
+						for (String existingColumnName : existingQueryColumns) {
+							String existingDefinedColumnName = orderQueryRepository.definedColumn(existingColumnName);
+							if (existingDefinedColumnName.equals(definedColumnName)) {
+								if (used == 0)
+									query.append(" Order By ");
+								if (used != 0)
+									query.append(", ");
+								query.append(orderQueryRepository.columnQuery(existingColumnName)).append(" ").append(order);
+								used++;
+							}
+						}
+					}
+				} else {
+					throw new OrderQueryException(String.format("Column %s for query name %s does not have an order direction", definedColumnName, queryName));
+				}
+			}
+			return query.toString();
+		} else {
+			throw new OrderQueryException(String.format("orderColumnNames and orderMappings do not have the same size"));
+		}
+	}
+
+	@Override
+	public String render(String queryName, List<String> orderedColumnNames, List<Order> orders) {
+		if (orderedColumnNames.size() == orders.size()) {
+			StringBuilder query = new StringBuilder(orderQueryRepository.query(queryName));
+			List<String> existingQueryColumns = orderQueryRepository.queryColumns(queryName);
+			int used = 0;
+			for (int index = 0; index < orderedColumnNames.size(); index++) {
+				String definedColumnName = orderedColumnNames.get(index);
+				Order order = orders.get(index);
+				if (!Order.NONE.equals(order)) {
+					for (String existingColumnName : existingQueryColumns) {
+						String existingDefinedColumnName = orderQueryRepository.definedColumn(existingColumnName);
+						if (existingDefinedColumnName.equals(definedColumnName)) {
+							if (used == 0)
+								query.append(" Order By ");
+							if (used != 0)
+								query.append(", ");
+							query.append(orderQueryRepository.columnQuery(existingColumnName)).append(" ").append(order);
+							used++;
+						}
+					}
+				}
+			}
+			return query.toString();
+		} else {
+			throw new OrderQueryException(String.format("orderColumnNames and orderMappings do not have the same size"));
 		}
 	}
 
