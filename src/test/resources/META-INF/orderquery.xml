@@ -14,4 +14,14 @@
 			SELECT xm FROM XmlModel xm
 		</query>
 	</orderquery>
+	<orderquery name="xmlModelDESC" model="xmlModel" defaultColumn="field1" defaultOrder="DESC">
+		<query>
+			SELECT xm FROM XmlModel xm
+		</query>
+	</orderquery>
+	<orderquery name="xmlModelASC" model="xmlModel" defaultColumn="field1" defaultOrder="ASC">
+		<query>
+			SELECT xm FROM XmlModel xm
+		</query>
+	</orderquery>
 </orderqueries>

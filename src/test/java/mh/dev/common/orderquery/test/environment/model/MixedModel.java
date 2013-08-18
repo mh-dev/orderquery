@@ -5,13 +5,16 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import mh.dev.common.orderquery.Order;
 import mh.dev.common.orderquery.annotation.OrderQueries;
 import mh.dev.common.orderquery.annotation.OrderQuery;
 import mh.dev.common.orderquery.annotation.OrderQueryModel;
 
 @Entity
 @OrderQueryModel
-@OrderQueries({ @OrderQuery(name = "mixedModel", query = "Select mm From MixedModel mm") })
+@OrderQueries({ @OrderQuery(name = "mixedModel", query = "Select mm From MixedModel mm"),
+		@OrderQuery(name = "mixedModelASC", query = "Select mm From MixedModel mm", defaultColumn = "field1", defaultOrder = Order.ASC),
+		@OrderQuery(name = "mixedModelDESC", query = "Select mm From MixedModel mm", defaultColumn = "field1", defaultOrder = Order.DESC) })
 public class MixedModel {
 
 	@Id

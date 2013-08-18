@@ -88,6 +88,8 @@ public class XmlLoader implements ModelLoader, QueryLoader, ConfigLoader {
 			OrderQuery orderQuery = new OrderQuery();
 			orderQuery.setModel(xmlOrderQuery.getModel());
 			orderQuery.setName(xmlOrderQuery.getName());
+			orderQuery.setDefaultColumn(xmlOrderQuery.getDefaultColumn());
+			orderQuery.setDefaultOrder(xmlOrderQuery.getDefaultOrder());
 			orderQuery.setQuery(xmlOrderQuery.getQuery());
 			for (XmlColumn xmlColumn : xmlOrderQuery.getColumns()) {
 				OrderQueryColumn orderQueryColumn = new OrderQueryColumn();

@@ -30,6 +30,12 @@ public class MixedModelOrderStateTests extends TestCore {
 	@Inject
 	@OrderStateConfig(queryName = "mixedModel")
 	private OrderState orderState;
+	@Inject
+	@OrderStateConfig(queryName = "mixedModelASC")
+	private OrderState orderStateDefaultASC;
+	@Inject
+	@OrderStateConfig(queryName = "mixedModelDESC")
+	private OrderState orderStateDefaultDESC;
 
 	private List<MixedModel> mixedModel = new ArrayList<>();
 
@@ -47,6 +53,28 @@ public class MixedModelOrderStateTests extends TestCore {
 	public void after() {
 		service.deleteAll(mixedModel);
 		mixedModel.clear();
+	}
+
+	@Test
+	public void orderByDefaultAttribute1Desc() {
+		List<MixedModel> orderedModels = service.all(orderStateDefaultDESC);
+		assertEquals(mixedModel.get(4).getField1(), orderedModels.get(0).getField1());
+		assertEquals(mixedModel.get(3).getField1(), orderedModels.get(1).getField1());
+		assertEquals(mixedModel.get(5).getField1(), orderedModels.get(2).getField1());
+		assertEquals(mixedModel.get(1).getField1(), orderedModels.get(3).getField1());
+		assertEquals(mixedModel.get(2).getField1(), orderedModels.get(4).getField1());
+		assertEquals(mixedModel.get(0).getField1(), orderedModels.get(5).getField1());
+	}
+
+	@Test
+	public void orderByDefaultAttribute1Asc() {
+		List<MixedModel> orderedModels = service.all(orderStateDefaultASC);
+		assertEquals(mixedModel.get(0).getField1(), orderedModels.get(0).getField1());
+		assertEquals(mixedModel.get(2).getField1(), orderedModels.get(1).getField1());
+		assertEquals(mixedModel.get(1).getField1(), orderedModels.get(2).getField1());
+		assertEquals(mixedModel.get(5).getField1(), orderedModels.get(3).getField1());
+		assertEquals(mixedModel.get(3).getField1(), orderedModels.get(4).getField1());
+		assertEquals(mixedModel.get(4).getField1(), orderedModels.get(5).getField1());
 	}
 
 	@Test

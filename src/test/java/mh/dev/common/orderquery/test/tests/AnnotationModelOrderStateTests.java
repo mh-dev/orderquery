@@ -30,6 +30,12 @@ public class AnnotationModelOrderStateTests extends TestCore {
 	@Inject
 	@OrderStateConfig(queryName = "annotationModel")
 	private OrderState orderState;
+	@Inject
+	@OrderStateConfig(queryName = "annotationModelASC")
+	private OrderState orderStateDefaultASC;
+	@Inject
+	@OrderStateConfig(queryName = "annotationModelDESC")
+	private OrderState orderStateDefaultDESC;
 
 	private List<AnnotationModel> annotationModels = new ArrayList<>();
 
@@ -47,6 +53,28 @@ public class AnnotationModelOrderStateTests extends TestCore {
 	public void after() {
 		service.deleteAll(annotationModels);
 		annotationModels.clear();
+	}
+
+	@Test
+	public void orderByDefaultAttribute1Desc() {
+		List<AnnotationModel> orderedModels = service.all(orderStateDefaultDESC);
+		assertEquals(annotationModels.get(4).getField1(), orderedModels.get(0).getField1());
+		assertEquals(annotationModels.get(3).getField1(), orderedModels.get(1).getField1());
+		assertEquals(annotationModels.get(5).getField1(), orderedModels.get(2).getField1());
+		assertEquals(annotationModels.get(1).getField1(), orderedModels.get(3).getField1());
+		assertEquals(annotationModels.get(2).getField1(), orderedModels.get(4).getField1());
+		assertEquals(annotationModels.get(0).getField1(), orderedModels.get(5).getField1());
+	}
+
+	@Test
+	public void orderByDefaultAttribute1Asc() {
+		List<AnnotationModel> orderedModels = service.all(orderStateDefaultASC);
+		assertEquals(annotationModels.get(0).getField1(), orderedModels.get(0).getField1());
+		assertEquals(annotationModels.get(2).getField1(), orderedModels.get(1).getField1());
+		assertEquals(annotationModels.get(1).getField1(), orderedModels.get(2).getField1());
+		assertEquals(annotationModels.get(5).getField1(), orderedModels.get(3).getField1());
+		assertEquals(annotationModels.get(3).getField1(), orderedModels.get(4).getField1());
+		assertEquals(annotationModels.get(4).getField1(), orderedModels.get(5).getField1());
 	}
 
 	@Test

@@ -6,11 +6,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import mh.dev.common.orderquery.Order;
 import mh.dev.common.orderquery.core.exception.OrderQueryException;
 import mh.dev.common.orderquery.core.model.OrderQuery;
 import mh.dev.common.orderquery.core.model.OrderQueryColumn;
 import mh.dev.common.orderquery.core.model.OrderQueryModel;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +47,16 @@ public class OrderQueryRepository {
 	 * queryName, modelName
 	 */
 	private ConcurrentHashMap<String, String> queryModels = new ConcurrentHashMap<>();
+
+	/**
+	 * queryName, columnName
+	 */
+	private ConcurrentHashMap<String, String> defaultQueryColumn = new ConcurrentHashMap<>();
+
+	/**
+	 * queryName, order
+	 */
+	private ConcurrentHashMap<String, Order> defaultQueryOrder = new ConcurrentHashMap<>();
 
 	// Model configuration
 	/**
@@ -116,6 +128,11 @@ public class OrderQueryRepository {
 				if (!queryColumns.containsKey(orderQuery.getName())) {
 					queryColumns.put(orderQuery.getName(), new ArrayList<String>());
 				}
+				if (StringUtils.isNotBlank(orderQuery.getDefaultColumn()) && orderQuery.getDefaultOrder() != null
+						&& !ObjectUtils.equals(orderQuery.getDefaultOrder(), Order.NONE)) {
+					defaultQueryColumn.put(orderQuery.getName(), orderQuery.getDefaultColumn());
+					defaultQueryOrder.put(orderQuery.getName(), orderQuery.getDefaultOrder());
+				}
 				for (OrderQueryColumn orderQueryColumn : orderQuery.getColumns()) {
 					String columnName = QUERY_COLUMN.concat(orderQuery.getName()).concat(orderQueryColumn.getName());
 					if (StringUtils.isNotBlank(orderQuery.getName()) && !queryColumns.containsKey(columnName)) {
@@ -182,6 +199,18 @@ public class OrderQueryRepository {
 
 	public String definedColumn(String column) {
 		return definedColumnNames.get(column);
+	}
+
+	public boolean hasDefaultOrdering(String queryName) {
+		return defaultQueryColumn.containsKey(queryName);
+	}
+
+	public String defaultColumn(String queryName) {
+		return defaultQueryColumn.get(queryName);
+	}
+
+	public Order defaultOrder(String queryName) {
+		return defaultQueryOrder.get(queryName);
 	}
 
 	public List<String> queryColumns(String queryName) {

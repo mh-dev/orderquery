@@ -80,7 +80,11 @@ public class OrderQueryBuilderImpl implements OrderQueryBuilder {
 				orders.put(publicColumnName, Order.NONE);
 				internalColumns.put(publicColumnName, column);
 			}
-			return new OrderStateImpl(queryName, orders, internalColumns);
+			OrderStateImpl orderStateImpl = new OrderStateImpl(queryName, orders, internalColumns);
+			if (orderQueryRepository.hasDefaultOrdering(queryName)) {
+				orderStateImpl.order(orderQueryRepository.defaultColumn(queryName), orderQueryRepository.defaultOrder(queryName));
+			}
+			return orderStateImpl;
 		} else {
 			throw new OrderQueryException(String.format("Query %s does not exist", queryName));
 		}

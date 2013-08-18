@@ -5,6 +5,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import mh.dev.common.orderquery.Order;
 import mh.dev.common.orderquery.annotation.OrderQueries;
 import mh.dev.common.orderquery.annotation.OrderQuery;
 import mh.dev.common.orderquery.annotation.OrderQueryColumn;
@@ -12,7 +13,9 @@ import mh.dev.common.orderquery.annotation.OrderQueryModel;
 
 @Entity
 @OrderQueryModel
-@OrderQueries({ @OrderQuery(name = "annotationModel", query = "Select am From AnnotationModel am") })
+@OrderQueries({ @OrderQuery(name = "annotationModel", query = "Select am From AnnotationModel am"),
+		@OrderQuery(name = "annotationModelASC", query = "Select am From AnnotationModel am", defaultColumn = "field1", defaultOrder = Order.ASC),
+		@OrderQuery(name = "annotationModelDESC", query = "Select am From AnnotationModel am", defaultColumn = "field1", defaultOrder = Order.DESC) })
 public class AnnotationModel {
 
 	@Id

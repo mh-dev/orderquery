@@ -20,6 +20,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 @RunWith(Arquillian.class)
 public class XmlModelOrderStateTests extends TestCore {
 
@@ -29,6 +30,13 @@ public class XmlModelOrderStateTests extends TestCore {
 	@Inject
 	@OrderStateConfig(queryName = "xmlModel")
 	private OrderState orderState;
+
+	@Inject
+	@OrderStateConfig(queryName = "xmlModelASC")
+	private OrderState orderStateDefaultASC;
+	@Inject
+	@OrderStateConfig(queryName = "xmlModelDESC")
+	private OrderState orderStateDefaultDESC;
 
 	private List<XmlModel> xmlModels = new ArrayList<>();
 
@@ -46,6 +54,28 @@ public class XmlModelOrderStateTests extends TestCore {
 	public void after() {
 		service.deleteAll(xmlModels);
 		xmlModels.clear();
+	}
+
+	@Test
+	public void orderByDefaultAttribute1Desc() {
+		List<XmlModel> orderedModels = service.all(orderStateDefaultDESC);
+		assertEquals(xmlModels.get(4).getField1(), orderedModels.get(0).getField1());
+		assertEquals(xmlModels.get(3).getField1(), orderedModels.get(1).getField1());
+		assertEquals(xmlModels.get(5).getField1(), orderedModels.get(2).getField1());
+		assertEquals(xmlModels.get(1).getField1(), orderedModels.get(3).getField1());
+		assertEquals(xmlModels.get(2).getField1(), orderedModels.get(4).getField1());
+		assertEquals(xmlModels.get(0).getField1(), orderedModels.get(5).getField1());
+	}
+
+	@Test
+	public void orderByDefaultAttribute1Asc() {
+		List<XmlModel> orderedModels = service.all(orderStateDefaultASC);
+		assertEquals(xmlModels.get(0).getField1(), orderedModels.get(0).getField1());
+		assertEquals(xmlModels.get(2).getField1(), orderedModels.get(1).getField1());
+		assertEquals(xmlModels.get(1).getField1(), orderedModels.get(2).getField1());
+		assertEquals(xmlModels.get(5).getField1(), orderedModels.get(3).getField1());
+		assertEquals(xmlModels.get(3).getField1(), orderedModels.get(4).getField1());
+		assertEquals(xmlModels.get(4).getField1(), orderedModels.get(5).getField1());
 	}
 
 	@Test
