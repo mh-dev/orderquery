@@ -32,9 +32,13 @@ public class OrderQueryBuilderProducer {
 		queryLoaders.add(annotationLoader);
 		for (QueryLoader queryLoader : queryLoaders) {
 			queryLoader.initialize();
+		}
+		for (QueryLoader queryLoader : queryLoaders) {
 			if (queryLoader instanceof ModelLoader) {
 				orderQueryRepository.addModels(queryLoader.getClass().getName(), ((ModelLoader) queryLoader).loadModels());
 			}
+		}
+		for (QueryLoader queryLoader : queryLoaders) {
 			if (queryLoader instanceof QueryLoader) {
 				orderQueryRepository.addQueries(queryLoader.getClass().getName(), ((QueryLoader) queryLoader).loadOrderQueries());
 			}

@@ -55,7 +55,8 @@ public class AnnotationLoader implements ModelLoader, QueryLoader {
 			}
 			orderQueryModel.setName(modelName);
 			orderQueryModel.setType(clazz);
-			for (Field field : clazz.getFields()) {
+
+			for (Field field : clazz.getDeclaredFields()) {
 				if (field.isAnnotationPresent(mh.dev.common.orderquery.annotation.OrderQueryColumn.class)) {
 					OrderQueryColumn orderQueryColumn = new OrderQueryColumn();
 					mh.dev.common.orderquery.annotation.OrderQueryColumn annotationColumn = field
@@ -66,6 +67,7 @@ public class AnnotationLoader implements ModelLoader, QueryLoader {
 					}
 					orderQueryColumn.setName(columnName);
 					orderQueryColumn.setQuery(annotationColumn.query());
+					orderQueryModel.getColumns().add(orderQueryColumn);
 				}
 			}
 			orderQueryModels.add(orderQueryModel);
@@ -91,7 +93,6 @@ public class AnnotationLoader implements ModelLoader, QueryLoader {
 					orderQueryColumn.setQuery(annotationOrderQueryColumn.query());
 					orderQuery.getColumns().add(orderQueryColumn);
 				}
-				System.out.println(orderQuery);
 				orderQueries.add(orderQuery);
 			}
 		}

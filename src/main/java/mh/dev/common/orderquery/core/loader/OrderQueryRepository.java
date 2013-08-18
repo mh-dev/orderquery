@@ -41,6 +41,11 @@ public class OrderQueryRepository {
 	 */
 	private ConcurrentHashMap<String, String> queries = new ConcurrentHashMap<>();
 
+	/**
+	 * queryName, modelName
+	 */
+	private ConcurrentHashMap<String, String> queryModels = new ConcurrentHashMap<>();
+
 	// Model configuration
 	/**
 	 * class, modelName
@@ -90,6 +95,23 @@ public class OrderQueryRepository {
 		for (OrderQuery orderQuery : orderQueries) {
 			if (StringUtils.isNotBlank(orderQuery.getName()) && !queryColumns.containsKey(orderQuery.getName())) {
 				log.debug(String.format("Add orderquery name %s with query %s", orderQuery.getName(), orderQuery.getQuery()));
+				if (StringUtils.isNotBlank(orderQuery.getModel()) && orderQuery.getType() != null) {
+					String modelName = classes.get(orderQuery.getType());
+					if (modelName.equals(orderQuery.getModel())) {
+						queryModels.put(orderQuery.getName(), modelName);
+					} else {
+						throw new OrderQueryException(String.format("Inconsitent configuration for queryName %s with source %s modelName %s and type %s",
+								orderQuery.getName(), source, modelName, orderQuery.getType().getName()));
+					}
+				} else if (StringUtils.isNotBlank(orderQuery.getModel())) {
+					queryModels.put(orderQuery.getName(), orderQuery.getModel());
+				} else if (orderQuery.getType() != null) {
+					if (classes.containsKey(orderQuery.getType())) {
+						queryModels.put(orderQuery.getName(), classes.get(orderQuery.getType()));
+					} else {
+						throw new OrderQueryException(String.format("Type %s for queryname %s with source %s could not be mapped to model configuration"));
+					}
+				}
 				queries.put(orderQuery.getName(), orderQuery.getQuery());
 				if (!queryColumns.containsKey(orderQuery.getName())) {
 					queryColumns.put(orderQuery.getName(), new ArrayList<String>());
@@ -172,7 +194,8 @@ public class OrderQueryRepository {
 				columns.add(column);
 			}
 		}
-		for (String column : modelColumns.get(queryName)) {
+		String modelName = queryModels.get(queryName);
+		for (String column : modelColumns.get(modelName)) {
 			String definedColumn = definedColumnNames.get(column);
 			if (!mappedDefinedColumns.contains(definedColumn)) {
 				mappedDefinedColumns.add(definedColumn);
