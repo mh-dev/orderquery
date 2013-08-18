@@ -4,7 +4,51 @@ orderquery
 Framework for dynamic orderable JPQL queries
 The goal of this project is to develop a framework which allows to write dynamic orderable JPQL queries in the same fashion as NamedQueries. But keep in mind that these queries are not pre compiled.
 
-The framework itself is at the moment under development so don't expect a bug free implementation. The configuration mentioned in the usage section should fully work. The testing needs a lot of time because I have to write tests for different applications servers to ensure compatibility. The current version is only tested with Glassfish 3.1.2.
+The current implementation is tested with Glassfish 3.1.2.
+Feel free do ask for additional features or send me bug reports.
+
+Next planned featurs and todos
+* support for own configuration loader classes
+* tests with additional application servers and in general a better test coverage
+
+
+## Dependency management
+The Jar file of this project is available in my Apache Archiva repository which can be found under the url [http://mathias-hauser.at/archiva/](http://mathias-hauser.at/archiva/)
+
+The direct link to the jar is [orderquery-0.0.1-20130818.175935-1.jar](http://mathias-hauser.at/archiva/repository/snapshots/mh/dev/common/orderquery/0.0.1-SNAPSHOT/orderquery-0.0.1-20130818.175935-1.jar) 
+
+More details see [mh.dev.common/orderquery/0.0.1-SNAPSHOT](http://mathias-hauser.at/archiva/#artifact/mh.dev.common/orderquery/0.0.1-SNAPSHOT) 
+
+If you prefer dependency management like gradle or maven (what I recommend) use the following snippets 
+### Gradle
+    repositories { 
+        maven{
+            url 'http://mathias-hauser.at/archiva/repository/internal/'
+        }
+        maven{
+            url 'http://mathias-hauser.at/archiva/repository/snapshots/'
+        }
+    }
+
+    dependencies {
+        compile group: 'mh.dev.common', name: 'query', version: '0.0.1-SNAPSHOT'
+    }
+### Maven
+    <repositories>
+        <repository>
+            <url>http://mathias-hauser.at/archiva/repository/internal/</url>
+        </repository>
+        <repository>
+            <url>http://mathias-hauser.at/archiva/repository/snapshots/</url>
+        </repository>
+    </repositories>
+
+    <dependency>
+        <groupId>mh.dev.common</groupId>
+        <artifactId>orderquery</artifactId>
+        <version> 0.0.1-SNAPSHOT</version>
+    </dependency>
+
 
 ## Usage
 Its required to but a xml file with name orderquery.xml in the META-INF folder. This an example from a simple test environment. Further description follow later.
