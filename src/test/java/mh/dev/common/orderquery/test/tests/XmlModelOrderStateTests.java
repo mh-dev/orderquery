@@ -30,7 +30,6 @@ public class XmlModelOrderStateTests extends TestCore {
 	@Inject
 	@OrderStateConfig(queryName = "xmlModel")
 	private OrderState orderState;
-
 	@Inject
 	@OrderStateConfig(queryName = "xmlModelASC")
 	private OrderState orderStateDefaultASC;
