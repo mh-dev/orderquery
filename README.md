@@ -1,7 +1,6 @@
 orderquery
 ==========
 
-Framework for dynamic orderable JPQL queries
 The goal of this project is to develop a framework which allows to write dynamic orderable JPQL queries in the same fashion as NamedQueries. But keep in mind that these queries are not pre compiled.
 
 The current implementation is tested with Glassfish 3.1.2.
