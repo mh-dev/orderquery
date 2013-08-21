@@ -33,17 +33,20 @@ public class XmlLoader implements ModelLoader, QueryLoader, ConfigLoader {
 	private XmlOrderQueries xmlOrderQueries;
 
 	private boolean initialized = false;
+	private InputStream orderQueryFile;
 	private static final Logger log = LoggerFactory.getLogger(XmlLoader.class);
-	private static final String ORDER_QUERY_XML_LOCATION = "META-INF/orderquery.xml";
+
+	public XmlLoader(InputStream orderQueryFile) {
+		this.orderQueryFile = orderQueryFile;
+	}
 
 	@Override
 	public void initialize() {
 		if (!initialized) {
 			log.debug("Initialize the xml configuration");
-			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(ORDER_QUERY_XML_LOCATION);
-			if (inputStream != null) {
+			if (orderQueryFile != null) {
 				try {
-					xmlOrderQueries = XMLUtils.unmarshal(inputStream, XmlOrderQueries.class);
+					xmlOrderQueries = XMLUtils.unmarshal(orderQueryFile, XmlOrderQueries.class);
 				} catch (UnmarshalFailedException e) {
 					throw new OrderQueryException(e);
 				}

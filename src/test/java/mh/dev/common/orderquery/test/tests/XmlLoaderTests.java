@@ -3,6 +3,7 @@ package mh.dev.common.orderquery.test.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.io.InputStream;
 import java.util.List;
 
 import mh.dev.common.orderquery.core.loader.xml.XmlLoader;
@@ -16,10 +17,12 @@ import org.junit.Test;
 public class XmlLoaderTests {
 
 	private XmlLoader xmlLoader;
+	private static final String ORDER_QUERY_XML_LOCATION = "META-INF/orderquery.xml";
 
 	@Before
 	public void before() {
-		xmlLoader = new XmlLoader();
+		InputStream orderQueryFile = this.getClass().getClassLoader().getResourceAsStream(ORDER_QUERY_XML_LOCATION);
+		xmlLoader = new XmlLoader(orderQueryFile);
 		xmlLoader.initialize();
 	}
 

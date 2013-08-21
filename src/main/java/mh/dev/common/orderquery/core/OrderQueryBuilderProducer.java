@@ -1,5 +1,6 @@
 package mh.dev.common.orderquery.core;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import javax.inject.Singleton;
 
 import mh.dev.common.orderquery.OrderQueryBuilder;
 import mh.dev.common.orderquery.annotation.OrderStateConfig;
+import mh.dev.common.orderquery.core.exception.OrderQueryException;
 import mh.dev.common.orderquery.core.loader.ModelLoader;
 import mh.dev.common.orderquery.core.loader.OrderQueryRepository;
 import mh.dev.common.orderquery.core.loader.QueryLoader;
@@ -33,39 +35,49 @@ public class OrderQueryBuilderProducer {
 
 	private OrderQueryRepository orderQueryRepository;
 
+	private static final String ORDER_QUERY_XML_LOCATION = "META-INF/orderquery.xml";
+
 	@PostConstruct
 	public void postConstruct() {
-		orderQueryRepository = new OrderQueryRepository();
 		List<QueryLoader> queryLoaders = new ArrayList<>();
-		XmlLoader xmlLoader = new XmlLoader();
-		xmlLoader.initialize();
-		queryLoaders.add(xmlLoader);
-		if (StringUtils.isNotBlank(xmlLoader.basePackage())) {
-			AnnotationLoader annotationLoader = new AnnotationLoader(xmlLoader.basePackage());
-			queryLoaders.add(annotationLoader);
-		}
-		log.trace("Starting initialization of the model and query loader classes");
-		// possible initialization
-		for (QueryLoader queryLoader : queryLoaders) {
-			queryLoader.initialize();
-		}
-		// read the model declarations
-		for (QueryLoader queryLoader : queryLoaders) {
-			if (queryLoader instanceof ModelLoader) {
-				orderQueryRepository.addModels(queryLoader.getClass().getName(), ((ModelLoader) queryLoader).loadModels());
+		InputStream orderQueryFile = this.getClass().getClassLoader().getResourceAsStream(ORDER_QUERY_XML_LOCATION);
+		if (orderQueryFile != null) {
+			orderQueryRepository = new OrderQueryRepository();
+			XmlLoader xmlLoader = new XmlLoader(orderQueryFile);
+			xmlLoader.initialize();
+			queryLoaders.add(xmlLoader);
+			if (StringUtils.isNotBlank(xmlLoader.basePackage())) {
+				AnnotationLoader annotationLoader = new AnnotationLoader(xmlLoader.basePackage());
+				queryLoaders.add(annotationLoader);
 			}
-		}
-		// read the query declarations
-		for (QueryLoader queryLoader : queryLoaders) {
-			if (queryLoader instanceof QueryLoader) {
-				orderQueryRepository.addQueries(queryLoader.getClass().getName(), ((QueryLoader) queryLoader).loadOrderQueries());
+			log.trace("Starting initialization of the model and query loader classes");
+			// possible initialization
+			for (QueryLoader queryLoader : queryLoaders) {
+				queryLoader.initialize();
 			}
+			// read the model declarations
+			for (QueryLoader queryLoader : queryLoaders) {
+				if (queryLoader instanceof ModelLoader) {
+					orderQueryRepository.addModels(queryLoader.getClass().getName(), ((ModelLoader) queryLoader).loadModels());
+				}
+			}
+			// read the query declarations
+			for (QueryLoader queryLoader : queryLoaders) {
+				if (queryLoader instanceof QueryLoader) {
+					orderQueryRepository.addQueries(queryLoader.getClass().getName(), ((QueryLoader) queryLoader).loadOrderQueries());
+				}
+			}
+		} else {
+			throw new OrderQueryException("orderquery.xml could not be found in the META-INF folder");
 		}
 	}
 
 	@Produces
 	@OrderStateConfig(queryName = "")
 	public OrderQueryBuilder produceOrderQueryBuilder(InjectionPoint injectionPoint) {
-		return new OrderQueryBuilderImpl(orderQueryRepository);
+		if (orderQueryRepository != null) {
+			return new OrderQueryBuilderImpl(orderQueryRepository);
+		}
+		return null;
 	}
 }
