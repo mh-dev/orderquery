@@ -18,7 +18,10 @@ public class OrderStateProducer {
 	@Produces
 	@OrderStateConfig(queryName = "")
 	public OrderState produceOrderQueryBuilder(InjectionPoint injectionPoint) {
-		OrderStateConfig orderStateConfig = injectionPoint.getAnnotated().getAnnotation(OrderStateConfig.class);
-		return orderQueryRenderer.orderState(orderStateConfig.queryName());
+		if (orderQueryRenderer != null) {
+			OrderStateConfig orderStateConfig = injectionPoint.getAnnotated().getAnnotation(OrderStateConfig.class);
+			return orderQueryRenderer.orderState(orderStateConfig.queryName());
+		}
+		return null;
 	}
 }

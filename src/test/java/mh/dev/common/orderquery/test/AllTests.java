@@ -10,6 +10,8 @@ import mh.dev.common.orderquery.test.tests.XmlLoaderTests;
 import mh.dev.common.orderquery.test.tests.XmlModelColumnListOrderListTests;
 import mh.dev.common.orderquery.test.tests.XmlModelColumnListOrderMapTests;
 import mh.dev.common.orderquery.test.tests.XmlModelOrderStateTests;
+import mh.dev.common.orderquery.test.tests.environment.EmptyXMLConfig;
+import mh.dev.common.orderquery.test.tests.environment.WithoutXMLConfig;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -18,7 +20,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({ AnnotationModelOrderStateTests.class, MixedModelOrderStateTests.class, XmlModelOrderStateTests.class,
 		AnnotationModelColumnListOrderMapTests.class, MixedModelColumnListOrderMapTests.class, XmlModelColumnListOrderMapTests.class,
-		AnnotationModelColumnListOrderListTests.class, MixedModelColumnListOrderListTests.class, XmlModelColumnListOrderListTests.class, XmlLoaderTests.class })
+		AnnotationModelColumnListOrderListTests.class, MixedModelColumnListOrderListTests.class, XmlModelColumnListOrderListTests.class, XmlLoaderTests.class,
+		EmptyXMLConfig.class, WithoutXMLConfig.class })
 public class AllTests {
 
 }

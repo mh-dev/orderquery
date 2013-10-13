@@ -17,7 +17,7 @@ import org.junit.Test;
 public class XmlLoaderTests {
 
 	private XmlLoader xmlLoader;
-	private static final String ORDER_QUERY_XML_LOCATION = "META-INF/orderquery.xml";
+	private static final String ORDER_QUERY_XML_LOCATION = "orderquery/default.xml";
 
 	@Before
 	public void before() {

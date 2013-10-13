@@ -40,7 +40,7 @@ public class OrderQueryBuilderProducer {
 	@PostConstruct
 	public void postConstruct() {
 		List<QueryLoader> queryLoaders = new ArrayList<>();
-		InputStream orderQueryFile = this.getClass().getClassLoader().getResourceAsStream(ORDER_QUERY_XML_LOCATION);
+		InputStream orderQueryFile = Thread.currentThread().getContextClassLoader().getResourceAsStream(ORDER_QUERY_XML_LOCATION);
 		if (orderQueryFile != null) {
 			orderQueryRepository = new OrderQueryRepository();
 			XmlLoader xmlLoader = new XmlLoader(orderQueryFile);
