@@ -69,7 +69,7 @@ Its required to but a xml file with name orderquery.xml in the META-INF folder. 
         </orderquery>
     </orderqueries>
 
-An example for annotation bases configuration is:
+An example for annotation based configuration is:
 
 	@Entity
 	@OrderQueryModel
